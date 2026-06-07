@@ -24,8 +24,9 @@ export const contactSchema = z.object({
   company: z.string().max(160).optional().or(z.literal("")),
   service: z.string().max(120).optional().or(z.literal("")),
   message: z.string().min(10).max(5000),
-  // Honeypot — must be empty (bots fill it).
-  website: z.string().max(0).optional(),
+  // Honeypot — accept any value here so a stray autofill never blocks a real
+  // user. The route silently drops the submission when this is non-empty.
+  website: z.string().max(200).optional(),
 });
 
 export const newsletterSchema = z.object({

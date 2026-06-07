@@ -51,11 +51,21 @@ export function ContactForm() {
       await apiFetch("/contact", { method: "POST", body: JSON.stringify(payload) });
       setStatus("done");
     } catch (err) {
-      setErrorMsg(
-        err instanceof ApiError
-          ? err.message
-          : "Couldn’t reach the server. Check your connection and try again.",
-      );
+      if (err instanceof ApiError) {
+        // Surface the specific field(s) when the server returns a Zod error,
+        // so the message is actionable instead of a vague "Validation failed".
+        const fieldErrors = (err.details as any)?.fieldErrors as
+          | Record<string, string[]>
+          | undefined;
+        const firstField = fieldErrors && Object.keys(fieldErrors)[0];
+        setErrorMsg(
+          firstField
+            ? `${firstField}: ${fieldErrors![firstField][0]}`
+            : err.message,
+        );
+      } else {
+        setErrorMsg("Couldn’t reach the server. Check your connection and try again.");
+      }
       setStatus("error");
     }
   }
