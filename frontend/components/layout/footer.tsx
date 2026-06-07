@@ -31,9 +31,9 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background">
-      <Container className="relative z-10 pb-40 sm:pb-52">
+      <Container className="relative z-10 pb-28 sm:pb-44 lg:pb-52">
         {/* ── Top disclaimer strip ───────────────────────────────────────── */}
-        <div className="flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-6 py-8 sm:flex-row sm:items-start sm:justify-between sm:py-10">
           <p className="max-w-xl text-xs leading-relaxed text-muted-foreground">
             {brand} performs security testing only under signed authorization and an agreed
             scope of work. Nothing on this site is an offer to perform unauthorized testing;
@@ -51,9 +51,11 @@ export function Footer({ settings }: { settings: SiteSettings }) {
         <div className="h-px w-full bg-border/60" />
 
         {/* ── Main grid ──────────────────────────────────────────────────── */}
-        <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        {/* Phone: brand full-width, link groups 2-up to cut height. sm: 2-col.
+            lg: brand + three link columns in a row. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 py-10 sm:gap-10 sm:py-14 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Brand + registration + seals */}
-          <div className="sm:col-span-2 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <Link
               href="/"
               aria-label={brand}

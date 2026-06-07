@@ -353,7 +353,7 @@ export function Capabilities() {
                     aria-pressed={on}
                     aria-expanded={!isDesktop ? on : undefined}
                     className={cn(
-                      "group relative flex w-full items-center gap-4 overflow-hidden rounded-xl border px-4 py-3.5 text-left transition-all duration-300",
+                      "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-300 sm:gap-4 sm:px-4 sm:py-3.5",
                       on
                         ? "border-primary/40 bg-card shadow-lg shadow-primary/5"
                         : "border-border/60 bg-card/40 hover:border-border hover:bg-card/70",
@@ -387,14 +387,18 @@ export function Capabilities() {
                         {c.tag}
                       </span>
                     </span>
-                    {/* Chevron: points to the stage on desktop, rotates to a
-                        caret on mobile to read as an accordion toggle. */}
+                    {/* Chevron. Mobile: always-visible accordion caret — points
+                        down when collapsed, up when expanded. Desktop: points at
+                        the stage when active, hidden otherwise. */}
                     <ChevronRight
                       className={cn(
-                        "h-4 w-4 shrink-0 text-primary transition-all duration-300",
+                        "h-4 w-4 shrink-0 transition-all duration-300",
+                        // Mobile accordion affordance (every row shows a caret).
+                        on ? "-rotate-90 text-primary" : "rotate-90 text-muted-foreground/50",
+                        // Desktop overrides.
                         on
-                          ? "translate-x-0 rotate-90 opacity-100 lg:rotate-0"
-                          : "-translate-x-1.5 opacity-0 lg:opacity-0",
+                          ? "lg:translate-x-0 lg:rotate-0 lg:opacity-100"
+                          : "lg:-translate-x-1.5 lg:rotate-0 lg:opacity-0",
                       )}
                     />
                   </button>

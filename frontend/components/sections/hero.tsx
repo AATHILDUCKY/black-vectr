@@ -173,7 +173,7 @@ function SolutionsPreview() {
 
   return (
     <div
-      className="relative mx-auto mt-20 max-w-6xl"
+      className="relative mx-auto mt-12 max-w-6xl sm:mt-20"
       style={{ animation: "enter-up 0.7s ease-out both", animationDelay: "0.5s" }}
     >
       {/* Soft ambient glow — static, no animation */}
@@ -210,34 +210,40 @@ function SolutionsPreview() {
             <EngagementFeed />
           </div>
 
-          {/* outcome stats */}
-          <div className="flex flex-col divide-y divide-border/50">
+          {/* outcome stats — on mobile they sit in a 3-up row under the feed so
+              the console stays compact; on md+ they stack beside the feed. */}
+          <div className="grid grid-cols-3 divide-x divide-border/50 border-t border-border/50 md:flex md:grid-cols-none md:flex-col md:divide-x-0 md:divide-y md:border-t-0">
             {stats.map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex flex-1 items-center gap-3 p-6">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-gradient text-background">
-                  <Icon className="h-5 w-5" />
+              <div
+                key={label}
+                className="flex flex-col items-center gap-1.5 p-4 text-center md:flex-1 md:flex-row md:gap-3 md:p-6 md:text-left"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-gradient text-background md:h-11 md:w-11">
+                  <Icon className="h-4 w-4 md:h-5 md:w-5" />
                 </span>
                 <div>
-                  <p className="font-display text-2xl font-bold">{value}</p>
-                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="font-display text-lg font-bold sm:text-2xl">{value}</p>
+                  <p className="text-[11px] leading-tight text-muted-foreground sm:text-xs">{label}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom progressive blur + fade — the console gently recedes into the page */}
+        {/* Bottom progressive blur + fade — a desktop-only flourish so the wide
+            console recedes into the page. Hidden on mobile, where the stacked
+            layout would otherwise let it cover the last stat. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-32 backdrop-blur-[1.5px] [mask-image:linear-gradient(to_bottom,transparent_25%,#000)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_25%,#000)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-32 backdrop-blur-[1.5px] [mask-image:linear-gradient(to_bottom,transparent_25%,#000)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_25%,#000)] md:block"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-16 backdrop-blur-[4px] [mask-image:linear-gradient(to_bottom,transparent,#000)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,#000)]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-16 backdrop-blur-[4px] [mask-image:linear-gradient(to_bottom,transparent,#000)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,#000)] md:block"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-background/30 to-background/85"
+          className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-36 bg-gradient-to-b from-transparent via-background/30 to-background/85 md:block"
         />
       </div>
       </ShineBorder>
