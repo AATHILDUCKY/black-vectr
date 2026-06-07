@@ -78,6 +78,7 @@ export const getSettings = () =>
       seoDescription: "",
       privacyPolicy: "",
       termsOfService: "",
+      gaMeasurementId: "",
     },
     "settings",
     30,

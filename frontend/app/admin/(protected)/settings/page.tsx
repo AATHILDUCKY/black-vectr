@@ -10,6 +10,7 @@ import {
   Search,
   Scale,
   KeyRound,
+  BarChart3,
 } from "lucide-react";
 import { apiFetch, ApiError, revalidatePublic } from "@/lib/client";
 import { Input, Textarea, Label, FieldError } from "@/components/ui/field";
@@ -32,6 +33,7 @@ const TABS = [
   { id: "contact", label: "Contact", icon: Mail, blurb: "Email, phone, and address" },
   { id: "social", label: "Social", icon: Share2, blurb: "Links shown in the footer" },
   { id: "seo", label: "SEO", icon: Search, blurb: "Default page title & description" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, blurb: "Google Analytics tracking" },
   { id: "legal", label: "Legal", icon: Scale, blurb: "Privacy Policy & Terms content" },
   { id: "security", label: "Security", icon: KeyRound, blurb: "Change your password" },
 ] as const;
@@ -263,6 +265,35 @@ export default function SettingsAdminPage() {
                   value={settings.seoDescription}
                   onChange={(e) => set("seoDescription", e.target.value)}
                 />
+              </Row>
+            </Panel>
+          )}
+
+          {tab === "analytics" && (
+            <Panel>
+              <p className="text-xs text-muted-foreground">
+                Paste your Google Analytics 4 Measurement ID to enable visitor tracking on the
+                public site. Find it in Google Analytics under{" "}
+                <span className="font-medium text-foreground">Admin → Data streams → your stream</span>.
+                Leave blank to disable tracking.
+              </p>
+              <Row label="GA4 Measurement ID">
+                <Input
+                  value={settings.gaMeasurementId ?? ""}
+                  placeholder="G-XXXXXXXXXX"
+                  spellCheck={false}
+                  onChange={(e) => set("gaMeasurementId", e.target.value.trim())}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {settings.gaMeasurementId?.trim() ? (
+                    <span className="text-green-600">
+                      ✓ Tracking active — gtag.js loads on every public page.
+                    </span>
+                  ) : (
+                    "Tracking is currently off."
+                  )}{" "}
+                  Tracking only runs on the public website, never in this admin area.
+                </p>
               </Row>
             </Panel>
           )}

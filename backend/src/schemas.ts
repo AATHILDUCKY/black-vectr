@@ -175,4 +175,10 @@ export const settingsUpdateSchema = z.object({
   seoDescription: z.string().optional(),
   privacyPolicy: z.string().optional(),
   termsOfService: z.string().optional(),
+  // Google Analytics 4 measurement ID, e.g. "G-XXXXXXXXXX". Empty disables it.
+  gaMeasurementId: z
+    .string()
+    .trim()
+    .regex(/^(G-[A-Z0-9]+)?$/i, "Use a GA4 ID like G-XXXXXXXXXX, or leave blank")
+    .optional(),
 });

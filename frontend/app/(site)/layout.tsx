@@ -4,6 +4,7 @@ import { BackToTop } from "@/components/layout/back-to-top";
 import { CookieNotice } from "@/components/layout/cookie-notice";
 import { ScrollProgress } from "@/components/animation/scroll-progress";
 import { SmoothScroll } from "@/components/animation/smooth-scroll";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { getSettings } from "@/lib/api";
 
 // Shared chrome for the public marketing site.
@@ -26,6 +27,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
       />
+      <GoogleAnalytics id={settings.gaMeasurementId} />
       <SmoothScroll />
       <ScrollProgress />
       <Navbar

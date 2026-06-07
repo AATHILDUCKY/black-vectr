@@ -119,6 +119,8 @@ export interface SiteSettings {
   /** Markdown for the legal pages. Empty → the page shows a sensible default. */
   privacyPolicy: string;
   termsOfService: string;
+  /** Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"). Empty → disabled. */
+  gaMeasurementId: string;
   updatedAt?: string;
 }
 

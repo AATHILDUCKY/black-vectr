@@ -180,5 +180,6 @@ model SiteSetting {
   seoDescription  String   @default("")
   privacyPolicy   String   @default("") // Markdown; falls back to a default when empty
   termsOfService  String   @default("") // Markdown; falls back to a default when empty
+  gaMeasurementId String   @default("") // Google Analytics 4 ID e.g. "G-XXXXXXXXXX"
   updatedAt       DateTime @updatedAt
 }
