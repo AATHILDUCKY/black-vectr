@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# env
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# next
+frontend/.next/
+frontend/out/
+
+# backend build
+backend/dist/
+
+# database
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+*.sqlite
+*.sqlite3
+
+# uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# misc
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+coverage/

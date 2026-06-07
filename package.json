@@ -1,0 +1,19 @@
+{
+  "name": "blackvectr-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Premium digital agency website — Next.js frontend + Express/Prisma backend in one repo.",
+  "scripts": {
+    "dev": "concurrently -n FRONTEND,BACKEND -c blue,green \"npm:dev:frontend\" \"npm:dev:backend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "start": "concurrently -n FRONTEND,BACKEND -c blue,green \"npm --prefix frontend run start\" \"npm --prefix backend run start\"",
+    "env:setup": "node scripts/ensure-env.mjs",
+    "setup": "node scripts/ensure-env.mjs && npm install && npm --prefix frontend install && npm --prefix backend install && npm --prefix backend run db:setup",
+    "db:reset": "npm --prefix backend run db:setup"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -1,0 +1,184 @@
+// Prisma schema — SQLite. Lists & maps are stored as JSON strings
+// (helpers in src/lib/json.ts parse/serialize them) since SQLite has no
+// native array/enum support.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String // bcrypt hash
+  name      String
+  role      String   @default("admin") // "admin" | "editor"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Contact-form submissions
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  company   String?
+  service   String? // service of interest
+  message   String
+  status    String   @default("new") // "new" | "read" | "handled"
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+  posts Post[]
+}
+
+model Post {
+  id             Int       @id @default(autoincrement())
+  title          String
+  slug           String    @unique
+  excerpt        String
+  body           String // markdown
+  coverImage     String?
+  status         String    @default("draft") // "draft" | "published"
+  tags           String    @default("[]") // JSON string[]
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  categoryId     Int?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+}
+
+model PortfolioItem {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  client    String
+  category  String
+  images    String   @default("[]") // JSON string[]
+  summary   String
+  results   String? // outcomes / metrics
+  link      String?
+  featured  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([featured])
+}
+
+model Service {
+  id               Int      @id @default(autoincrement())
+  title            String
+  slug             String   @unique
+  icon             String? // icon key (lucide name) or image url
+  shortDescription String
+  longDescription  String
+  features         String   @default("[]") // JSON string[]
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String?
+  company   String?
+  quote     String
+  avatar    String?
+  rating    Int      @default(5)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model TeamMember {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String
+  photo     String?
+  bio       String?
+  socials   String   @default("{}") // JSON { twitter?, linkedin?, github?, dribbble? }
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+/// Open-source projects the company builds and maintains. Each can carry a
+/// list of attached resources (repo, docs, demo, package…) stored as JSON.
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  tagline     String // one-liner shown on the project card
+  description String // longer write-up (markdown)
+  language    String? // primary language, e.g. "Python", "Go", "Rust"
+  topics      String   @default("[]") // JSON string[] — e.g. ["osint","cli"]
+  repoUrl     String? // canonical source link (usually GitHub)
+  stars       Int      @default(0) // GitHub stars (manually curated)
+  license     String? // e.g. "MIT", "Apache-2.0"
+  status      String   @default("active") // "active" | "wip" | "archived"
+  resources   String   @default("[]") // JSON { label, url }[]
+  coverImage  String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([featured])
+  @@index([order])
+}
+
+/// Trusted-by / partner logos shown in the homepage scrolling marquee.
+model Logo {
+  id        Int      @id @default(autoincrement())
+  name      String
+  logo      String? // uploaded image URL (optional — falls back to name wordmark)
+  url       String? // optional outbound link
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([order])
+}
+
+/// Singleton row (id = 1) holding editable site-wide settings.
+model SiteSetting {
+  id              Int      @id @default(1)
+  brandName       String   @default("BlackVectr")
+  tagline         String   @default("")
+  logoUrl         String?
+  logoMode        String   @default("logo_name") // "logo_name" | "logo" | "name"
+  contactEmail    String   @default("hello@blackvectr.com")
+  contactPhone    String?
+  address         String?
+  socials         String   @default("{}") // JSON { twitter?, linkedin?, instagram?, facebook? }
+  heroHeadline    String   @default("We help businesses grow online")
+  heroSubheadline String   @default("")
+  heroCta         String   @default("Start a project")
+  seoTitle        String   @default("BlackVectr — Cybersecurity for modern infrastructure")
+  seoDescription  String   @default("")
+  privacyPolicy   String   @default("") // Markdown; falls back to a default when empty
+  termsOfService  String   @default("") // Markdown; falls back to a default when empty
+  updatedAt       DateTime @updatedAt
+}

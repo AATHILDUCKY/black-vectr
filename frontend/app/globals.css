@@ -1,0 +1,548 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme — premium monochrome: a soft off-white canvas with pure-white
+       cards floating on it. The 2% gap between --background (98%) and --card
+       (100%), plus the card shadows below, give every surface gentle elevation
+       so the white theme reads layered and modern instead of flat. */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 38%;
+    --border: 0 0% 90%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --accent: 0 0% 32%;
+    --accent-foreground: 0 0% 98%;
+    --warning: 0 0% 45%;
+    /* Ambient glow + shine tints (theme-aware). In light, a glow can't be
+       brighter than white, so it's a soft, airy neutral haze (kept light so it
+       reads as a clean bloom, not a muddy grey smudge); shine is a dark-grey. */
+    --glow: 0 0% 66%;
+    --shine: 0 0% 35%;
+    /* Soft, layered card shadow — neutralised to none in dark mode. */
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 12px 28px -14px hsl(0 0% 0% / 0.12);
+    --radius: 0.875rem;
+  }
+
+  .dark {
+    /* Dark theme — premium monochrome: true black with silver/white glow (the default) */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 7%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 64%;
+    --border: 0 0% 17%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 6%;
+    --accent: 0 0% 72%;
+    --accent-foreground: 0 0% 8%;
+    --warning: 0 0% 70%;
+    /* Dark: glow is a bright near-white (light blooms on black); shine is silver. */
+    --glow: 0 0% 96%;
+    --shine: 0 0% 85%;
+    /* Dark cards sit on near-black — drop shadows are invisible, so disable them
+       and let the border + bg carry the elevation. */
+    --shadow-card: none;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset in-page anchor jumps so headings clear the fixed navbar
+       (h-16 mobile / h-20 desktop) instead of hiding beneath it. */
+    scroll-padding-top: 6rem;
+  }
+
+  /* Lenis momentum scroll: when active it adds these classes to <html> and
+     drives scroll itself, so native smooth-scroll must step aside to avoid a
+     double-eased, laggy feel. Falls back to native smooth when Lenis is off
+     (reduced-motion, touch, or before hydration). */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Guard against stray horizontal scroll from decorative/overflowing elements
+       on small screens — a common mobile annoyance. */
+    overflow-x: hidden;
+  }
+
+  /* Respect reduced motion globally — disables CSS + smooth scroll. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.3);
+  }
+}
+
+@layer components {
+  .container-px {
+    @apply mx-auto w-full max-w-container px-5 sm:px-8;
+  }
+  .text-gradient {
+    @apply bg-accent-gradient bg-clip-text text-transparent;
+  }
+
+  /* Layered hero atmosphere: masked so motion frames the copy instead of fighting it. */
+  .hero-atmosphere {
+    -webkit-mask-image:
+      linear-gradient(to bottom, black 0%, black 76%, transparent 100%),
+      radial-gradient(ellipse 86% 70% at 50% 24%, black, transparent 82%);
+    mask-image:
+      linear-gradient(to bottom, black 0%, black 76%, transparent 100%),
+      radial-gradient(ellipse 86% 70% at 50% 24%, black, transparent 82%);
+  }
+
+  /* Vertical light column behind the headline and preview. */
+  .hero-beam {
+    background:
+      radial-gradient(
+        48% 100% at 50% 100%,
+        hsl(var(--primary) / 0.55) 0%,
+        hsl(var(--accent) / 0.24) 34%,
+        transparent 74%
+      ),
+      linear-gradient(
+        to top,
+        transparent,
+        hsl(var(--primary) / 0.14) 34%,
+        transparent 82%
+      );
+    -webkit-mask-image: linear-gradient(to top, black, transparent 95%);
+    mask-image: linear-gradient(to top, black, transparent 95%);
+    filter: blur(0.5px);
+  }
+
+  /* Wide radial glow at the top of a section */
+  .hero-glow {
+    background:
+      radial-gradient(60% 48% at 50% 0%, hsl(var(--glow) / 0.2) 0%, transparent 68%),
+      radial-gradient(42% 38% at 50% 24%, hsl(var(--accent) / 0.14) 0%, transparent 72%);
+  }
+
+  /* Faint technical grid — the recurring cyber backdrop */
+  .cyber-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--primary) / 0.13) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--primary) / 0.1) 1px, transparent 1px);
+    background-position: center top;
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 76% 58% at 50% 34%, black, transparent 78%);
+    mask-image: radial-gradient(ellipse 76% 58% at 50% 34%, black, transparent 78%);
+  }
+
+  .hero-grid-vignette {
+    background:
+      linear-gradient(to bottom, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.78) 92%),
+      radial-gradient(ellipse 50% 34% at 50% 38%, transparent 0%, hsl(var(--background) / 0.56) 82%);
+  }
+
+  .galaxy-void {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 76% 64% at 50% 18%, hsl(var(--primary) / 0.18), transparent 58%),
+      radial-gradient(ellipse 48% 36% at 52% 35%, hsl(var(--accent) / 0.16), transparent 68%),
+      linear-gradient(180deg, hsl(224 72% 3% / 0.18), hsl(var(--background) / 0.86) 92%);
+  }
+
+  /* Frames the rays around the headline and fades them into the page edges. */
+  .hero-rays-mask {
+    opacity: 0.9;
+    mix-blend-mode: screen;
+    -webkit-mask-image:
+      linear-gradient(to bottom, black 0%, black 66%, transparent 100%),
+      radial-gradient(ellipse 90% 80% at 50% 0%, black, transparent 80%);
+    mask-image:
+      linear-gradient(to bottom, black 0%, black 66%, transparent 100%),
+      radial-gradient(ellipse 90% 80% at 50% 0%, black, transparent 80%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  .galaxy-webgl {
+    position: absolute;
+    inset: -14% -8% -8%;
+    opacity: 0.98;
+    filter: saturate(1.15) contrast(1.08);
+    -webkit-mask-image: radial-gradient(ellipse 92% 78% at 50% 28%, black, transparent 82%);
+    mask-image: radial-gradient(ellipse 92% 78% at 50% 28%, black, transparent 82%);
+  }
+
+  .galaxy-webgl canvas {
+    display: block;
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .galaxy-nebula {
+    position: absolute;
+    inset: 0;
+    opacity: 0.86;
+    background:
+      radial-gradient(ellipse 42% 22% at 51% 34%, hsl(35 100% 96% / 0.22), transparent 70%),
+      radial-gradient(ellipse 72% 28% at 50% 36%, hsl(var(--primary) / 0.2), transparent 68%),
+      radial-gradient(ellipse 54% 24% at 58% 31%, hsl(var(--accent) / 0.16), transparent 72%);
+    mix-blend-mode: screen;
+    filter: blur(12px) saturate(1.2);
+    transform: rotate(-8deg);
+  }
+
+  .galaxy-comet {
+    position: absolute;
+    left: 74%;
+    top: 17%;
+    height: 1px;
+    width: 9rem;
+    opacity: 0;
+    background: linear-gradient(to right, transparent, hsl(var(--foreground) / 0.92), hsl(var(--primary) / 0.78), transparent);
+    filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.64));
+    transform: rotate(-24deg);
+  }
+
+  @media (max-width: 640px) {
+    .galaxy-webgl {
+      inset: -8% -34% -6%;
+      opacity: 0.82;
+    }
+
+    .galaxy-nebula {
+      opacity: 0.62;
+    }
+  }
+
+  .hero-data-rain {
+    position: absolute;
+    inset: -16% 8% 0;
+    opacity: 0.34;
+    background-image:
+      linear-gradient(180deg, transparent 0 34%, hsl(var(--primary) / 0.22) 35%, transparent 39%),
+      linear-gradient(180deg, transparent 0 58%, hsl(var(--accent) / 0.2) 59%, transparent 63%);
+    background-position:
+      0 0,
+      34px 80px;
+    background-size:
+      92px 260px,
+      128px 340px;
+    -webkit-mask-image: radial-gradient(ellipse 76% 60% at 50% 28%, black, transparent 72%);
+    mask-image: radial-gradient(ellipse 76% 60% at 50% 28%, black, transparent 72%);
+  }
+
+  .logo-marquee {
+    position: relative;
+    overflow: hidden;
+    padding-block: 0.25rem;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent);
+  }
+
+  .logo-marquee::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-block: 1px solid hsl(var(--border) / 0.38);
+    background:
+      radial-gradient(42% 90% at 50% 50%, hsl(var(--primary) / 0.08), transparent 70%),
+      linear-gradient(to right, transparent, hsl(var(--primary) / 0.06), transparent);
+    pointer-events: none;
+  }
+
+  .logo-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: logo-marquee 36s linear infinite;
+    will-change: transform;
+  }
+
+  .logo-marquee:hover .logo-marquee-track {
+    animation-play-state: paused;
+  }
+
+  .logo-marquee-segment {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: clamp(1rem, 3.4vw, 3.5rem);
+    padding-right: clamp(1rem, 3.4vw, 3.5rem);
+  }
+
+  /* Container-less item: logos sit directly on the strip, no pill/border/box. */
+  .logo-marquee-item {
+    display: inline-flex;
+    min-height: 4.5rem;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  /* ── Liquid glass card ───────────────────────────────────────────────────── */
+  /* Dark (default): dark translucent surface with high-contrast glow bloom.   */
+  /* Light: near-opaque white card with soft shadow, same specular highlights. */
+  .liquid-glass {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem; /* rounded-3xl */
+
+    /* Surface */
+    background: hsl(var(--card) / 0.35);
+    backdrop-filter: blur(32px) saturate(1.6);
+    -webkit-backdrop-filter: blur(32px) saturate(1.6);
+
+    /* Border: subtle on sides/bottom, no top edge (top border removed) */
+    border: 1px solid hsl(var(--primary) / 0.14);
+    border-top-color: transparent;
+    box-shadow:
+      inset 0 -1px 0 hsl(0 0% 0% / 0.14),        /* bottom inner shadow */
+      0 2px 4px hsl(0 0% 0% / 0.08),
+      0 24px 56px -16px hsl(0 0% 0% / 0.28);     /* ambient shadow */
+  }
+
+  /* Refraction layer: layered radial gradients painted via a pseudo */
+  .liquid-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      /* subtle left-edge caustic */
+      radial-gradient(25% 55% at 0% 30%, hsl(var(--primary) / 0.07) 0%, transparent 70%),
+      /* bottom glow bloom */
+      radial-gradient(65% 50% at 50% 110%, hsl(var(--glow) / 0.22) 0%, transparent 65%);
+  }
+
+  /* Light-mode overrides: more opaque, softer shadow */
+  :root .liquid-glass {
+    background: hsl(var(--card) / 0.82);
+    box-shadow:
+      inset 0 -1px 0 hsl(0 0% 0% / 0.04),
+      0 1px 3px hsl(0 0% 0% / 0.06),
+      0 16px 40px -16px hsl(0 0% 0% / 0.14);
+    border-color: hsl(0 0% 0% / 0.08);
+    border-top-color: transparent;
+  }
+
+  /* Floating orb blobs behind the glass for depth — driven by CSS animations */
+  @keyframes lg-drift-a {
+    0%   { transform: translate(0, 0) scale(1); }
+    40%  { transform: translate(6%, -8%) scale(1.06); }
+    70%  { transform: translate(-4%, 5%) scale(0.96); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+  @keyframes lg-drift-b {
+    0%   { transform: translate(0, 0) scale(1); }
+    35%  { transform: translate(-7%, 6%) scale(1.08); }
+    65%  { transform: translate(5%, -4%) scale(0.94); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  .lg-orb {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    filter: blur(48px);
+    will-change: transform;
+  }
+  .lg-orb-a {
+    width: 55%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.22) 0%, transparent 70%);
+    top: -20%;
+    left: -10%;
+    animation: lg-drift-a 14s ease-in-out infinite;
+  }
+  .lg-orb-b {
+    width: 45%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle, hsl(var(--glow) / 0.18) 0%, transparent 70%);
+    bottom: -15%;
+    right: -8%;
+    animation: lg-drift-b 18s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lg-orb { animation: none; }
+  }
+
+  /* Responsive 16:9 video embed (YouTube etc.) used in blog post Markdown. */
+  .video-embed {
+    position: relative;
+    margin: 1.5rem 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--muted));
+  }
+  .video-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Animated electric border (React Bits) */
+  .electric-border {
+    --electric-light-color: oklch(from var(--electric-border-color) l c h);
+    position: relative;
+    border-radius: inherit;
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  .eb-canvas-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .eb-canvas {
+    display: block;
+  }
+
+  .eb-content {
+    position: relative;
+    border-radius: inherit;
+    z-index: 1;
+  }
+
+  .eb-layers {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .eb-glow-1,
+  .eb-glow-2,
+  .eb-background-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+
+  .eb-glow-1 {
+    border: 2px solid oklch(from var(--electric-border-color) l c h / 0.6);
+    filter: blur(1px);
+  }
+
+  .eb-glow-2 {
+    border: 2px solid var(--electric-light-color);
+    filter: blur(4px);
+  }
+
+  .eb-background-glow {
+    z-index: -1;
+    transform: scale(1.1);
+    filter: blur(32px);
+    opacity: 0.3;
+    background: linear-gradient(-30deg, var(--electric-light-color), transparent, var(--electric-border-color));
+  }
+
+  /* Card with an animated gradient hairline border on hover */
+  .glow-card {
+    @apply relative rounded-2xl border border-border bg-card transition-all duration-300;
+    /* Resting elevation (light only — token is `none` in dark). */
+    box-shadow: var(--shadow-card);
+  }
+  /* Minimal surface gradient: a whisper-soft top-to-bottom sheen so white cards
+     have dimension without an obvious gradient. Light theme only. */
+  :root .glow-card {
+    background-image: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98.5%) 100%);
+  }
+  .dark .glow-card {
+    background-image: none;
+  }
+
+  /* Reusable resting elevation for standalone cards (portfolio, testimonials…)
+     so they match the service cards. Token-driven → automatically flat in dark. */
+  .card-elevated {
+    box-shadow: var(--shadow-card);
+  }
+  .glow-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.5));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .glow-card:hover::before {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 32s linear infinite;
+  }
+  .bg-grid-mask {
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent 80%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent 80%);
+  }
+}
+
+@keyframes logo-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
