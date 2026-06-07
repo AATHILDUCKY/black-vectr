@@ -42,15 +42,25 @@ type TabId = (typeof TABS)[number]["id"];
 export default function SettingsAdminPage() {
   const [settings, setSettings] = React.useState<SiteSettings | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [saved, setSaved] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [tab, setTab] = React.useState<TabId>("brand");
 
-  React.useEffect(() => {
+  const load = React.useCallback(() => {
+    setLoading(true);
+    setError(null);
     apiFetch<SiteSettings>("/settings")
       .then(setSettings)
+      .catch((err) =>
+        setError(err instanceof ApiError ? err.message : "Couldn't reach the server."),
+      )
       .finally(() => setLoading(false));
   }, []);
+
+  React.useEffect(() => {
+    load();
+  }, [load]);
 
   function set<K extends keyof SiteSettings>(key: K, value: SiteSettings[K]) {
     setSettings((s) => (s ? { ...s, [key]: value } : s));
@@ -71,10 +81,25 @@ export default function SettingsAdminPage() {
     setSaved(true);
   }
 
-  if (loading || !settings) {
+  if (loading) {
     return (
       <div className="flex items-center gap-2 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" /> Loading settings…
+      </div>
+    );
+  }
+
+  if (error || !settings) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-6">
+        <h2 className="font-semibold">Couldn’t load settings</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {error ?? "No settings were returned."} Make sure the backend API is running, then try
+          again.
+        </p>
+        <Button type="button" variant="outline" className="mt-4" onClick={load}>
+          Retry
+        </Button>
       </div>
     );
   }
