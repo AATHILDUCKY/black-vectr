@@ -219,7 +219,7 @@ export function Galaxy({
 
     const ctn = ctnDom.current;
     const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl", {
+    const glCtx = canvas.getContext("webgl", {
       alpha: transparent,
       premultipliedAlpha: false,
       antialias: false,
@@ -227,7 +227,10 @@ export function Galaxy({
       stencil: false,
     });
 
-    if (!gl) return;
+    if (!glCtx) return;
+    // Non-null alias so the narrowing holds inside nested closures below
+    // (TypeScript widens `glCtx` back to nullable within inner functions).
+    const gl: WebGLRenderingContext = glCtx;
 
     canvas.style.display = "block";
     canvas.style.width = "100%";

@@ -21,7 +21,7 @@ export function signToken(payload: JwtPayload): string {
 }
 
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, env.jwtSecret) as JwtPayload;
+  return jwt.verify(token, env.jwtSecret) as unknown as JwtPayload;
 }
 
 // Options shared by login/logout so the cookie is set & cleared identically.
