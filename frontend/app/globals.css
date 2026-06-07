@@ -29,57 +29,15 @@
     --radius: 0.875rem;
   }
 
-  .dark {
-    /* Dark theme — premium monochrome: true black with silver/white glow (the default) */
-    --background: 0 0% 3%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 7%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 64%;
-    --border: 0 0% 17%;
-    --primary: 0 0% 96%;
-    --primary-foreground: 0 0% 6%;
-    --accent: 0 0% 72%;
-    --accent-foreground: 0 0% 8%;
-    --warning: 0 0% 70%;
-    /* Dark: glow is a bright near-white (light blooms on black); shine is silver. */
-    --glow: 0 0% 96%;
-    --shine: 0 0% 85%;
-    /* Dark cards sit on near-black — drop shadows are invisible, so disable them
-       and let the border + bg carry the elevation. */
-    --shadow-card: none;
-  }
-
   * {
     border-color: hsl(var(--border));
   }
 
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     /* Offset in-page anchor jumps so headings clear the fixed navbar
        (h-16 mobile / h-20 desktop) instead of hiding beneath it. */
-    scroll-padding-top: 6rem;
-  }
-
-  /* Lenis momentum scroll: when active it adds these classes to <html> and
-     drives scroll itself, so native smooth-scroll must step aside to avoid a
-     double-eased, laggy feel. Falls back to native smooth when Lenis is off
-     (reduced-motion, touch, or before hydration). */
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
-
-  .lenis.lenis-smooth {
-    scroll-behavior: auto !important;
-  }
-
-  .lenis.lenis-smooth [data-lenis-prevent] {
-    overscroll-behavior: contain;
-  }
-
-  .lenis.lenis-stopped {
-    overflow: hidden;
+    scroll-padding-top: 5rem;
   }
 
   body {
@@ -179,57 +137,6 @@
       radial-gradient(ellipse 50% 34% at 50% 38%, transparent 0%, hsl(var(--background) / 0.56) 82%);
   }
 
-  .galaxy-void {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 76% 64% at 50% 18%, hsl(var(--primary) / 0.18), transparent 58%),
-      radial-gradient(ellipse 48% 36% at 52% 35%, hsl(var(--accent) / 0.16), transparent 68%),
-      linear-gradient(180deg, hsl(224 72% 3% / 0.18), hsl(var(--background) / 0.86) 92%);
-  }
-
-  /* Frames the rays around the headline and fades them into the page edges. */
-  .hero-rays-mask {
-    opacity: 0.9;
-    mix-blend-mode: screen;
-    -webkit-mask-image:
-      linear-gradient(to bottom, black 0%, black 66%, transparent 100%),
-      radial-gradient(ellipse 90% 80% at 50% 0%, black, transparent 80%);
-    mask-image:
-      linear-gradient(to bottom, black 0%, black 66%, transparent 100%),
-      radial-gradient(ellipse 90% 80% at 50% 0%, black, transparent 80%);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
-  }
-
-  .galaxy-webgl {
-    position: absolute;
-    inset: -14% -8% -8%;
-    opacity: 0.98;
-    filter: saturate(1.15) contrast(1.08);
-    -webkit-mask-image: radial-gradient(ellipse 92% 78% at 50% 28%, black, transparent 82%);
-    mask-image: radial-gradient(ellipse 92% 78% at 50% 28%, black, transparent 82%);
-  }
-
-  .galaxy-webgl canvas {
-    display: block;
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  .galaxy-nebula {
-    position: absolute;
-    inset: 0;
-    opacity: 0.86;
-    background:
-      radial-gradient(ellipse 42% 22% at 51% 34%, hsl(35 100% 96% / 0.22), transparent 70%),
-      radial-gradient(ellipse 72% 28% at 50% 36%, hsl(var(--primary) / 0.2), transparent 68%),
-      radial-gradient(ellipse 54% 24% at 58% 31%, hsl(var(--accent) / 0.16), transparent 72%);
-    mix-blend-mode: screen;
-    filter: blur(12px) saturate(1.2);
-    transform: rotate(-8deg);
-  }
-
   .galaxy-comet {
     position: absolute;
     left: 74%;
@@ -240,34 +147,6 @@
     background: linear-gradient(to right, transparent, hsl(var(--foreground) / 0.92), hsl(var(--primary) / 0.78), transparent);
     filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.64));
     transform: rotate(-24deg);
-  }
-
-  @media (max-width: 640px) {
-    .galaxy-webgl {
-      inset: -8% -34% -6%;
-      opacity: 0.82;
-    }
-
-    .galaxy-nebula {
-      opacity: 0.62;
-    }
-  }
-
-  .hero-data-rain {
-    position: absolute;
-    inset: -16% 8% 0;
-    opacity: 0.34;
-    background-image:
-      linear-gradient(180deg, transparent 0 34%, hsl(var(--primary) / 0.22) 35%, transparent 39%),
-      linear-gradient(180deg, transparent 0 58%, hsl(var(--accent) / 0.2) 59%, transparent 63%);
-    background-position:
-      0 0,
-      34px 80px;
-    background-size:
-      92px 260px,
-      128px 340px;
-    -webkit-mask-image: radial-gradient(ellipse 76% 60% at 50% 28%, black, transparent 72%);
-    mask-image: radial-gradient(ellipse 76% 60% at 50% 28%, black, transparent 72%);
   }
 
   .logo-marquee {
@@ -292,7 +171,7 @@
   .logo-marquee-track {
     display: flex;
     width: max-content;
-    animation: logo-marquee 36s linear infinite;
+    animation: logo-marquee 18s linear infinite;
     will-change: transform;
   }
 
@@ -391,7 +270,7 @@
     background: radial-gradient(circle, hsl(var(--primary) / 0.22) 0%, transparent 70%);
     top: -20%;
     left: -10%;
-    animation: lg-drift-a 14s ease-in-out infinite;
+    animation: lg-drift-a 7s ease-in-out infinite;
   }
   .lg-orb-b {
     width: 45%;
@@ -399,7 +278,7 @@
     background: radial-gradient(circle, hsl(var(--glow) / 0.18) 0%, transparent 70%);
     bottom: -15%;
     right: -8%;
-    animation: lg-drift-b 18s ease-in-out infinite;
+    animation: lg-drift-b 9s ease-in-out infinite;
   }
   @media (prefers-reduced-motion: reduce) {
     .lg-orb { animation: none; }
@@ -423,70 +302,6 @@
     border: 0;
   }
 
-  /* Animated electric border (React Bits) */
-  .electric-border {
-    --electric-light-color: oklch(from var(--electric-border-color) l c h);
-    position: relative;
-    border-radius: inherit;
-    overflow: visible;
-    isolation: isolate;
-  }
-
-  .eb-canvas-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .eb-canvas {
-    display: block;
-  }
-
-  .eb-content {
-    position: relative;
-    border-radius: inherit;
-    z-index: 1;
-  }
-
-  .eb-layers {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .eb-glow-1,
-  .eb-glow-2,
-  .eb-background-glow {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    box-sizing: border-box;
-  }
-
-  .eb-glow-1 {
-    border: 2px solid oklch(from var(--electric-border-color) l c h / 0.6);
-    filter: blur(1px);
-  }
-
-  .eb-glow-2 {
-    border: 2px solid var(--electric-light-color);
-    filter: blur(4px);
-  }
-
-  .eb-background-glow {
-    z-index: -1;
-    transform: scale(1.1);
-    filter: blur(32px);
-    opacity: 0.3;
-    background: linear-gradient(-30deg, var(--electric-light-color), transparent, var(--electric-border-color));
-  }
-
   /* Card with an animated gradient hairline border on hover */
   .glow-card {
     @apply relative rounded-2xl border border-border bg-card transition-all duration-300;
@@ -498,12 +313,9 @@
   :root .glow-card {
     background-image: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98.5%) 100%);
   }
-  .dark .glow-card {
-    background-image: none;
-  }
 
   /* Reusable resting elevation for standalone cards (portfolio, testimonials…)
-     so they match the service cards. Token-driven → automatically flat in dark. */
+     so they match the service cards. */
   .card-elevated {
     box-shadow: var(--shadow-card);
   }
@@ -530,11 +342,27 @@
 
 @layer utilities {
   .animate-marquee {
-    animation: marquee 32s linear infinite;
+    animation: marquee 16s linear infinite;
   }
   .bg-grid-mask {
     -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent 80%);
     mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent 80%);
+  }
+
+  /* Scroll-reveal entrance — driven by an IntersectionObserver that flips
+     data-shown on the element (or the group container). See reveal.tsx. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 16px));
+    transition:
+      opacity 450ms cubic-bezier(0.21, 0.47, 0.32, 0.98),
+      transform 450ms cubic-bezier(0.21, 0.47, 0.32, 0.98);
+    will-change: opacity, transform;
+  }
+  .reveal[data-shown="true"],
+  .reveal-group[data-shown="true"] .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -544,5 +372,188 @@
   }
   to {
     transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+/* ── CSS-only animation keyframes (replacing the former framer-motion usage) ── */
+
+/* Generic entrance: fade + lift. Used by hero, capabilities stage, etc. */
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero engagement-feed row entrance. */
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal panel entrance. */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Capabilities micro-visualisations ─────────────────────────────────────── */
+
+/* Exploit chain: pulse travelling along a connector. */
+@keyframes exploit-pulse {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+/* Exploit chain: node breathing + border flash. */
+@keyframes exploit-node {
+  0%,
+  100% {
+    border-color: hsl(var(--border));
+    transform: scale(1);
+  }
+  50% {
+    border-color: hsl(var(--primary) / 0.6);
+    transform: scale(1.08);
+  }
+}
+
+/* Lateral move / radar blip on-off. */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Binary stream: column drift (paired with `alternate`). */
+@keyframes bin-col {
+  from {
+    transform: translateY(-8%);
+  }
+  to {
+    transform: translateY(8%);
+  }
+}
+
+/* Binary stream: bit flicker. */
+@keyframes bin-flicker {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Severity bars: width pulse between two values (set via --a / --b). */
+@keyframes sev-rank {
+  0%,
+  100% {
+    width: var(--a);
+  }
+  50% {
+    width: var(--b);
+  }
+}
+
+/* Retest shield: pulsing focus ring. */
+@keyframes retest-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px hsl(var(--primary) / 0.08);
+  }
+}
+
+/* Retest shield: sweeping scan line. */
+@keyframes retest-scan {
+  0%,
+  100% {
+    top: 12%;
+    opacity: 0;
+  }
+  50% {
+    top: 88%;
+    opacity: 1;
+  }
+}
+
+/* Radar sweep rotation. */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Radar blip pop. */
+@keyframes blip {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* Capabilities desktop auto-advance progress bar. */
+@keyframes stage-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Reveals must never get stuck hidden when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-shown="true"],
+  .reveal-group .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

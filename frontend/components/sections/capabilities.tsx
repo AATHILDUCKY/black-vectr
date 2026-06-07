@@ -1,27 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion, useReducedMotion, type Transition } from "framer-motion";
 import { Bug, Swords, Binary, ScanSearch, ShieldCheck, Radar, Check, ChevronRight } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/animation/reveal";
 import { cn } from "@/lib/utils";
 
-// Gentle, infinite ease for the in-tile micro-visuals.
-const loop = (duration: number, delay = 0): Transition => ({
-  duration,
-  delay,
-  repeat: Infinity,
-  ease: "easeInOut",
-});
-
 // ── Micro-visuals ────────────────────────────────────────────────────────────
 // Each one illustrates the capability it sits on. Monochrome, GPU-cheap
-// (opacity/transform only), and statically rendered under reduced-motion.
+// (opacity/transform only) CSS keyframe loops (see globals.css), and statically
+// rendered under prefers-reduced-motion (neutralised globally).
 
 /** Exploit chain: a pulse travels a chain of weaknesses into final "impact". */
 function ExploitChainViz() {
-  const reduce = useReducedMotion();
   const nodes = [0, 1, 2, 3];
   return (
     <div className="relative flex h-full w-full items-center justify-center">
@@ -31,39 +22,23 @@ function ExploitChainViz() {
           <React.Fragment key={i}>
             {i > 0 && (
               <div className="relative h-px w-7 overflow-hidden bg-border sm:w-9">
-                {!reduce && (
-                  <motion.span
-                    className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-transparent via-primary to-transparent"
-                    initial={{ x: "-100%" }}
-                    animate={{ x: ["-100%", "300%"] }}
-                    transition={loop(2.4, i * 0.45)}
-                  />
-                )}
+                <span
+                  className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-transparent via-primary to-transparent motion-reduce:hidden"
+                  style={{ animation: `exploit-pulse 2.4s ease-in-out ${i * 0.45}s infinite` }}
+                />
               </div>
             )}
-            <motion.span
+            <span
               className={cn(
                 "grid h-8 w-8 place-items-center rounded-lg border text-[10px] font-semibold",
                 i === nodes.length - 1
                   ? "border-primary/60 bg-primary/15 text-primary"
                   : "border-border bg-card text-muted-foreground",
               )}
-              animate={
-                reduce
-                  ? undefined
-                  : {
-                      borderColor: [
-                        "hsl(var(--border))",
-                        "hsl(var(--primary) / 0.6)",
-                        "hsl(var(--border))",
-                      ],
-                      scale: [1, 1.08, 1],
-                    }
-              }
-              transition={loop(2.4, i * 0.45)}
+              style={{ animation: `exploit-node 2.4s ease-in-out ${i * 0.45}s infinite` }}
             >
               {i === nodes.length - 1 ? "!" : i + 1}
-            </motion.span>
+            </span>
           </React.Fragment>
         ))}
       </div>
@@ -73,7 +48,6 @@ function ExploitChainViz() {
 
 /** Lateral movement: a marker hops host-to-host across a small fleet. */
 function LateralMoveViz() {
-  const reduce = useReducedMotion();
   const hosts = [0, 1, 2, 3, 4, 5];
   return (
     <div className="grid h-full w-full grid-cols-3 grid-rows-2 place-items-center gap-2 px-2">
@@ -83,14 +57,10 @@ function LateralMoveViz() {
           className="relative grid h-7 w-full max-w-[44px] place-items-center rounded-md border border-border bg-card"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-          {!reduce && (
-            <motion.span
-              className="absolute inset-0 rounded-md border border-primary/70 bg-primary/10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={loop(0.9, i * 0.5)}
-            />
-          )}
+          <span
+            className="absolute inset-0 rounded-md border border-primary/70 bg-primary/10 opacity-0 motion-reduce:hidden"
+            style={{ animation: `blink 0.9s ease-in-out ${i * 0.5}s infinite` }}
+          />
         </div>
       ))}
     </div>
@@ -99,32 +69,26 @@ function LateralMoveViz() {
 
 /** Binary / reverse-engineering: columns of bits drifting and flickering. */
 function BinaryStreamViz() {
-  const reduce = useReducedMotion();
   // Fixed patterns (no Math.random) so SSR and client match.
   const cols = ["10110", "01001", "11010", "00111", "10100", "01101"];
   return (
     <div className="flex h-full w-full items-center justify-center gap-2 overflow-hidden font-mono text-[11px] leading-tight text-muted-foreground/70">
       {cols.map((bits, c) => (
-        <motion.div
+        <div
           key={c}
           className="flex flex-col"
-          initial={{ y: 0 }}
-          animate={reduce ? undefined : { y: ["-8%", "8%"] }}
-          transition={loop(2.6 + (c % 3) * 0.6, c * 0.2)}
+          style={{ animation: `bin-col ${2.6 + (c % 3) * 0.6}s ease-in-out ${c * 0.2}s infinite alternate` }}
         >
           {bits.split("").map((b, r) => (
-            <motion.span
+            <span
               key={r}
-              animate={
-                reduce ? undefined : { opacity: [0.25, 0.9, 0.25] }
-              }
-              transition={loop(1.8 + (r % 3) * 0.4, (c + r) * 0.18)}
               className={r === 2 ? "text-primary" : undefined}
+              style={{ animation: `bin-flicker ${1.8 + (r % 3) * 0.4}s ease-in-out ${(c + r) * 0.18}s infinite` }}
             >
               {b}
-            </motion.span>
+            </span>
           ))}
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -132,7 +96,6 @@ function BinaryStreamViz() {
 
 /** Risk ranking: severity bars that re-sort, top one highlighted. */
 function SeverityRankViz() {
-  const reduce = useReducedMotion();
   const bars = [
     { a: "92%", b: "64%" },
     { a: "70%", b: "88%" },
@@ -145,14 +108,16 @@ function SeverityRankViz() {
         <div key={i} className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-            <motion.div
-              className={cn(
-                "h-full rounded-full",
-                i === 0 ? "bg-primary" : "bg-foreground/30",
-              )}
-              initial={{ width: bar.a }}
-              animate={reduce ? undefined : { width: [bar.a, bar.b, bar.a] }}
-              transition={loop(4, i * 0.3)}
+            <div
+              className={cn("h-full rounded-full", i === 0 ? "bg-primary" : "bg-foreground/30")}
+              style={
+                {
+                  width: bar.a,
+                  "--a": bar.a,
+                  "--b": bar.b,
+                  animation: `sev-rank 4s ease-in-out ${i * 0.3}s infinite`,
+                } as React.CSSProperties
+              }
             />
           </div>
         </div>
@@ -163,40 +128,25 @@ function SeverityRankViz() {
 
 /** Retest: a shield with a sweeping scan line, confirming the fix holds. */
 function RetestShieldViz() {
-  const reduce = useReducedMotion();
   return (
     <div className="relative flex h-full w-full items-center justify-center">
-      <motion.span
+      <span
         className="relative grid h-14 w-14 place-items-center rounded-2xl border border-border bg-card text-primary"
-        animate={
-          reduce
-            ? undefined
-            : { boxShadow: [
-                "0 0 0 0 hsl(var(--primary) / 0)",
-                "0 0 0 6px hsl(var(--primary) / 0.08)",
-                "0 0 0 0 hsl(var(--primary) / 0)",
-              ] }
-        }
-        transition={loop(2.6)}
+        style={{ animation: "retest-glow 2.6s ease-in-out infinite" }}
       >
         <ShieldCheck className="h-7 w-7" />
-        {!reduce && (
-          <motion.span
-            aria-hidden
-            className="absolute inset-x-1 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
-            initial={{ top: "12%", opacity: 0 }}
-            animate={{ top: ["12%", "88%", "12%"], opacity: [0, 1, 0] }}
-            transition={loop(2.6)}
-          />
-        )}
-      </motion.span>
+        <span
+          aria-hidden
+          className="absolute inset-x-1 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 motion-reduce:hidden"
+          style={{ top: "12%", animation: "retest-scan 2.6s ease-in-out infinite" }}
+        />
+      </span>
     </div>
   );
 }
 
 /** Reconnaissance: a radar sweep painting the attack surface, blips lighting up. */
 function ReconRadarViz() {
-  const reduce = useReducedMotion();
   const blips = [
     { left: "64%", top: "30%", delay: 0 },
     { left: "34%", top: "58%", delay: 1.0 },
@@ -217,27 +167,22 @@ function ReconRadarViz() {
         <span className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border/50" />
         <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-border/50" />
         {/* rotating sweep */}
-        {!reduce && (
-          <motion.span
-            className="absolute inset-0 rounded-full"
-            style={{
-              background:
-                "conic-gradient(from 0deg, hsl(var(--primary) / 0.34) 0deg, transparent 55deg)",
-              WebkitMaskImage: "radial-gradient(circle, #000 70%, transparent 71%)",
-              maskImage: "radial-gradient(circle, #000 70%, transparent 71%)",
-            }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
-          />
-        )}
+        <span
+          className="absolute inset-0 rounded-full motion-reduce:hidden"
+          style={{
+            background:
+              "conic-gradient(from 0deg, hsl(var(--primary) / 0.34) 0deg, transparent 55deg)",
+            WebkitMaskImage: "radial-gradient(circle, #000 70%, transparent 71%)",
+            maskImage: "radial-gradient(circle, #000 70%, transparent 71%)",
+            animation: "spin 3.2s linear infinite",
+          }}
+        />
         {/* discovered assets */}
         {blips.map((b, i) => (
-          <motion.span
+          <span
             key={i}
-            className="absolute h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.7)]"
-            style={{ left: b.left, top: b.top }}
-            animate={reduce ? undefined : { opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }}
-            transition={loop(3.2, b.delay)}
+            className="absolute h-1.5 w-1.5 rounded-full bg-primary opacity-0 shadow-[0_0_8px_hsl(var(--primary)/0.7)]"
+            style={{ left: b.left, top: b.top, animation: `blip 3.2s ease-in-out ${b.delay}s infinite` }}
           />
         ))}
       </div>
@@ -349,15 +294,18 @@ function CapabilityDetail({ cap, compact = false }: { cap: Cap; compact?: boolea
  *  · Desktop (lg+): a selectable list drives a large animated "stage", and the
  *    selection auto-cycles (pausing on hover/focus).
  *  · Mobile: the list becomes an accordion — tapping an item expands its detail
- *    inline, so the result is always right under your finger. Auto-cycle is off
- *    on mobile so the page never shifts on its own.
+ *    inline. Auto-cycle is off on mobile so the page never shifts on its own.
  * Only the active visual is mounted. Inert under prefers-reduced-motion.
  */
 export function Capabilities() {
-  const reduce = useReducedMotion();
   const [active, setActive] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const [isDesktop, setIsDesktop] = React.useState(false);
+  const [reduce, setReduce] = React.useState(false);
+
+  React.useEffect(() => {
+    setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
 
   // Track the lg breakpoint so auto-cycle only runs in the desktop stage layout.
   React.useEffect(() => {
@@ -451,30 +399,25 @@ export function Capabilities() {
                     />
                   </button>
 
-                  {/* Mobile accordion panel — desktop uses the stage instead */}
-                  <div className="lg:hidden">
-                    <AnimatePresence initial={false}>
-                      {on && (
-                        <motion.div
-                          key="panel"
-                          initial={reduce ? false : { height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <div className="relative mt-2 overflow-hidden rounded-xl border border-border/60 bg-card/50 p-5">
-                            <div
-                              aria-hidden
-                              className="cyber-grid pointer-events-none absolute inset-0 opacity-20"
-                            />
-                            <div className="relative">
-                              <CapabilityDetail cap={c} compact />
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                  {/* Mobile accordion panel — CSS grid-rows height transition.
+                      Desktop uses the stage instead. */}
+                  <div
+                    className={cn(
+                      "grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out lg:hidden",
+                      on ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                    )}
+                  >
+                    <div className="min-h-0 overflow-hidden">
+                      <div className="relative mt-2 overflow-hidden rounded-xl border border-border/60 bg-card/50 p-5">
+                        <div
+                          aria-hidden
+                          className="cyber-grid pointer-events-none absolute inset-0 opacity-20"
+                        />
+                        <div className="relative">
+                          <CapabilityDetail cap={c} compact />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -491,31 +434,23 @@ export function Capabilities() {
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,hsl(var(--glow)/0.14),transparent_65%)]"
               />
 
-              {/* auto-advance progress bar */}
+              {/* auto-advance progress bar — restarts on each active change via key */}
               {!reduce && !paused && isDesktop && active >= 0 && (
-                <motion.span
-                  key={active}
+                <span
+                  key={`progress-${active}`}
                   aria-hidden
                   className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left bg-accent-gradient"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: CYCLE_MS / 1000, ease: "linear" }}
+                  style={{ animation: `stage-progress ${CYCLE_MS}ms linear` }}
                 />
               )}
 
               {current && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active}
-                    initial={reduce ? false : { opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduce ? undefined : { opacity: 0, y: -18 }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative flex h-full flex-col p-7 sm:p-9"
-                  >
-                    <CapabilityDetail cap={current} />
-                  </motion.div>
-                </AnimatePresence>
+                <div
+                  key={`stage-${active}`}
+                  className="relative flex h-full flex-col p-7 sm:p-9 motion-safe:animate-[enter-up_0.4s_cubic-bezier(0.22,1,0.36,1)]"
+                >
+                  <CapabilityDetail cap={current} />
+                </div>
               )}
             </div>
           </Reveal>

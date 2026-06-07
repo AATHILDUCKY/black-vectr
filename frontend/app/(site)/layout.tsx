@@ -2,8 +2,6 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { CookieNotice } from "@/components/layout/cookie-notice";
-import { ScrollProgress } from "@/components/animation/scroll-progress";
-import { SmoothScroll } from "@/components/animation/smooth-scroll";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { getSettings } from "@/lib/api";
 
@@ -28,8 +26,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
       />
       <GoogleAnalytics id={settings.gaMeasurementId} />
-      <SmoothScroll />
-      <ScrollProgress />
       <Navbar
         brandName={settings.brandName}
         logoUrl={settings.logoUrl}

@@ -1,28 +1,16 @@
 "use client";
 
 import * as React from "react";
-import {
-  motion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
- * Scroll-linked vertical parallax. As the wrapper passes through the viewport,
- * its children translate on the Y axis, creating depth on scroll. It reads the
- * native scroll position (so it composes with Lenis smooth scroll), animates
- * transform only (GPU-cheap), and is completely inert under
- * prefers-reduced-motion.
+ * Scroll-linked vertical parallax (vanilla rAF, no animation library). As the
+ * wrapper passes through the viewport its child translates on the Y axis,
+ * creating depth on scroll. Transform-only (GPU-cheap), throttled to one update
+ * per frame, and completely inert under prefers-reduced-motion.
  *
- * `speed` is the peak offset in px applied across one viewport pass — positive
- * means the layer drifts *up* as you scroll down (it recedes). Keep it small
- * (16–60) for a premium, non-distracting feel. Nest this around content that
- * already has its own entrance animation: the outer wrapper owns the scroll
- * transform, the inner element owns the entrance, so the two never fight over
- * `transform`.
+ * `speed` is the peak offset in px across one viewport pass — positive means the
+ * layer drifts *up* as you scroll down. Keep it small (16–60) for a premium feel.
  */
 export function Parallax({
   children,
@@ -33,24 +21,60 @@ export function Parallax({
   speed?: number;
   className?: string;
 }) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const outer = React.useRef<HTMLDivElement>(null);
+  const inner = React.useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const raw = useTransform(scrollYProgress, [0, 1], [speed, -speed]);
-  const y = useSpring(raw, { stiffness: 100, damping: 30, mass: 0.3 });
+  React.useEffect(() => {
+    const el = outer.current;
+    const target = inner.current;
+    if (!el || !target) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let raf = 0;
+    let visible = false;
+
+    const update = () => {
+      raf = 0;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // progress 0→1 as the element travels from entering bottom to leaving top.
+      const progress = (vh - rect.top) / (vh + rect.height);
+      const clamped = Math.min(Math.max(progress, 0), 1);
+      const y = speed - clamped * speed * 2; // +speed → -speed
+      target.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+    };
+
+    const onScroll = () => {
+      if (!visible || raf) return;
+      raf = requestAnimationFrame(update);
+    };
+
+    // Only listen while the element is on (or near) screen.
+    const io = new IntersectionObserver(
+      (entries) => {
+        visible = entries[0]?.isIntersecting ?? false;
+        if (visible) onScroll();
+      },
+      { rootMargin: "100px 0px" },
+    );
+    io.observe(el);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    update();
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [speed]);
 
   return (
-    <div ref={ref} className={className}>
-      <motion.div
-        style={reduce ? undefined : { y }}
-        className={cn(!reduce && "will-change-transform")}
-      >
+    <div ref={outer} className={className}>
+      <div ref={inner} className={cn("will-change-transform")}>
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }

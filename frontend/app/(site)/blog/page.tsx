@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container, Section, SectionHeading, Badge } from "@/components/ui/primitives";
+import { OptimizedImage } from "@/components/optimized-image";
 import { Reveal, RevealGroup } from "@/components/animation/reveal";
 import { formatDate } from "@/lib/utils";
 import { getPosts } from "@/lib/api";
@@ -30,10 +31,15 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5"
                 >
-                  <div className="flex aspect-[16/9] items-center justify-center bg-accent-gradient">
+                  <div className="flex aspect-[16/9] items-center justify-center overflow-hidden bg-accent-gradient">
                     {post.coverImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" loading="lazy" />
+                      <OptimizedImage
+                        src={post.coverImage}
+                        alt={post.title}
+                        className="h-full w-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
                     ) : (
                       <span className="px-6 text-center font-display text-lg font-semibold text-background/90">
                         {post.title}

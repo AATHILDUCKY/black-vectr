@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
-import { motion } from "framer-motion";
 import { Github, Star, ArrowUpRight, Circle } from "lucide-react";
+import { Reveal } from "@/components/animation/reveal";
 import type { Project } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -57,13 +57,10 @@ export function ProjectsGrid({ items }: { items: Project[] }) {
 
       <div className="grid gap-6 sm:grid-cols-2">
         {filtered.map((p, i) => (
-          <motion.article
+          <Reveal
+            as="article"
             key={p.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: (i % 4) * 0.05 }}
+            delay={(i % 4) * 0.05}
             className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
           >
             {/* Header: title + repo link */}
@@ -134,7 +131,7 @@ export function ProjectsGrid({ items }: { items: Project[] }) {
                 ))}
               </div>
             )}
-          </motion.article>
+          </Reveal>
         ))}
       </div>
     </div>

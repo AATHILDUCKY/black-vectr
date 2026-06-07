@@ -1,74 +1,93 @@
 "use client";
 import * as React from "react";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-
-// Shared easing — a soft, premium ease-out.
-const EASE = [0.21, 0.47, 0.32, 0.98] as const;
-
-// Lets a <Reveal> know it lives inside a <RevealGroup>, so the parent can
-// orchestrate the entrance + stagger instead of each child triggering on its
-// own viewport intersection (cheaper, and actually staggers).
-const GroupContext = React.createContext(false);
+import { cn } from "@/lib/utils";
 
 /**
- * Scroll-reveal wrapper. Fades + lifts children in once as they enter the
- * viewport. Uses only opacity/transform (GPU-composited, no layout thrash) and
- * honors prefers-reduced-motion (renders statically).
+ * Scroll-reveal — fades + lifts children in once as they enter the viewport.
+ * Pure CSS transitions driven by a single IntersectionObserver per reveal (no
+ * animation library): the element starts translated/transparent and gets
+ * `data-shown="true"` when it scrolls into view; the `.reveal` CSS class (see
+ * globals.css) animates the rest. GPU-composited (opacity/transform only) and
+ * inert under prefers-reduced-motion.
  */
+
+// Fire once, slightly before the element is fully in view.
+const OBSERVER_OPTS: IntersectionObserverInit = {
+  threshold: 0.15,
+  rootMargin: "0px 0px -8% 0px",
+};
+
+function useRevealOnce<T extends HTMLElement>(enabled = true) {
+  const ref = React.useRef<T>(null);
+  React.useEffect(() => {
+    if (!enabled) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries, obs) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          (entry.target as HTMLElement).dataset.shown = "true";
+          obs.unobserve(entry.target);
+        }
+      }
+    }, OBSERVER_OPTS);
+    io.observe(el);
+    return () => io.disconnect();
+  }, [enabled]);
+  return ref;
+}
+
+// Lets a <Reveal> know it lives inside a <RevealGroup>, so the group's single
+// observer + stagger drive the entrance instead of each child observing itself.
+const GroupContext = React.createContext(false);
+
 export function Reveal({
   children,
   delay = 0,
   y = 16,
   className,
-  as = "div",
+  as: Tag = "div",
 }: {
   children: React.ReactNode;
   delay?: number;
   y?: number;
   className?: string;
-  as?: keyof typeof motion;
+  as?: React.ElementType;
 }) {
-  const reduce = useReducedMotion();
   const inGroup = React.useContext(GroupContext);
-  const MotionTag = motion[as] as typeof motion.div;
 
-  const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : y },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.55, delay, ease: EASE },
-    },
-  };
-
-  // Inside a group: declare variants only and inherit hidden/show from the
-  // parent, which drives the staggered entrance.
+  // Inside a group: render only the caller's wrapper (preserving className for
+  // layout) — the group provides the animated `.reveal` wrapper around us.
   if (inGroup) {
-    return (
-      <MotionTag className={className} variants={variants}>
-        {children}
-      </MotionTag>
-    );
+    return <Tag className={className}>{children}</Tag>;
   }
 
+  const ref = useRevealOnce<HTMLElement>();
   return (
-    <MotionTag
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={variants}
+    <Tag
+      ref={ref}
+      className={cn("reveal", className)}
+      style={
+        {
+          "--reveal-y": `${y}px`,
+          transitionDelay: delay ? `${delay * 1000}ms` : undefined,
+        } as React.CSSProperties
+      }
     >
       {children}
-    </MotionTag>
+    </Tag>
   );
 }
 
-/** Staggered container — wrap <Reveal> children for a cascading entrance. */
+/**
+ * Staggered container — one observer reveals the whole group; each direct child
+ * is wrapped in a `.reveal` element with an incremental transition-delay so they
+ * cascade in. `stagger` / `delayChildren` are in seconds (unchanged API).
+ */
 export function RevealGroup({
   children,
   className,
-  stagger = 0.08,
+  stagger = 0.05,
   delayChildren = 0,
 }: {
   children: React.ReactNode;
@@ -76,20 +95,21 @@ export function RevealGroup({
   stagger?: number;
   delayChildren?: number;
 }) {
+  const ref = useRevealOnce<HTMLDivElement>();
+  const items = React.Children.toArray(children);
   return (
     <GroupContext.Provider value={true}>
-      <motion.div
-        className={className}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={{
-          hidden: {},
-          show: { transition: { staggerChildren: stagger, delayChildren } },
-        }}
-      >
-        {children}
-      </motion.div>
+      <div ref={ref} className={cn("reveal-group", className)}>
+        {items.map((child, i) => (
+          <div
+            key={i}
+            className="reveal"
+            style={{ transitionDelay: `${delayChildren + i * stagger}s` }}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
     </GroupContext.Provider>
   );
 }

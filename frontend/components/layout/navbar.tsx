@@ -2,11 +2,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const NAV = [
   { href: "/services", label: "Solutions" },
@@ -91,7 +89,6 @@ export function Navbar({
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <ButtonLink href="/contact" size="sm" className="hidden sm:inline-flex">
             Book assessment
           </ButtonLink>
@@ -106,32 +103,30 @@ export function Navbar({
         </div>
       </nav>
 
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-b border-border bg-background md:hidden"
-          >
-            <div className="container-px flex flex-col gap-1 py-4">
-              {NAV.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-lg px-4 py-3 text-base font-medium hover:bg-muted"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <ButtonLink href="/contact" className="mt-2 w-full">
-                Book assessment
-              </ButtonLink>
-            </div>
-          </motion.div>
+      {/* Mobile drawer — CSS grid-rows height transition, no JS animation lib. */}
+      <div
+        className={cn(
+          "grid overflow-hidden border-border bg-background transition-[grid-template-rows,opacity] duration-300 ease-out md:hidden",
+          open ? "grid-rows-[1fr] border-b opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
-      </AnimatePresence>
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="container-px flex flex-col gap-1 py-4">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-lg px-4 py-3 text-base font-medium hover:bg-muted"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <ButtonLink href="/contact" className="mt-2 w-full">
+              Book assessment
+            </ButtonLink>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

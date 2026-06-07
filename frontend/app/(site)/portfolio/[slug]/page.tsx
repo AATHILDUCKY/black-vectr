@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, TrendingUp } from "lucide-react";
 import { Container, Section } from "@/components/ui/primitives";
 import { ButtonLink } from "@/components/ui/button";
+import { OptimizedImage } from "@/components/optimized-image";
 import { Reveal } from "@/components/animation/reveal";
 import { getPortfolio, getPortfolioItem } from "@/lib/api";
 
@@ -54,8 +55,14 @@ export default async function PortfolioDetailPage({
         <Reveal delay={0.1}>
           <div className="mt-8 flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl bg-accent-gradient">
             {item.images[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.images[0]} alt={item.title} className="h-full w-full object-cover" />
+              <OptimizedImage
+                src={item.images[0]}
+                alt={item.title}
+                className="h-full w-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 768px"
+                priority
+              />
             ) : (
               <span className="font-display text-5xl font-bold text-background/90">{item.client}</span>
             )}

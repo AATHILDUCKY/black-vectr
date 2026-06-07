@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { MarkdownContent } from "@/components/markdown-content";
+import { OptimizedImage } from "@/components/optimized-image";
 import { Container, Section, Badge } from "@/components/ui/primitives";
 import { formatDate } from "@/lib/utils";
 import { getPost, getPosts } from "@/lib/api";
@@ -74,8 +75,13 @@ export default async function BlogPostPage({
 
         {post.coverImage && (
           <div className="mt-8 overflow-hidden rounded-2xl">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.coverImage} alt={post.title} className="w-full" />
+            <OptimizedImage
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 768px"
+              priority
+            />
           </div>
         )}
 

@@ -1,12 +1,18 @@
 "use client";
 import * as React from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ShieldCheck, Bug, Swords, Crosshair } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/primitives";
 import { HeroBackground } from "@/components/sections/hero-background";
 import { Parallax } from "@/components/animation/parallax";
 import { ShineBorder } from "@/components/ui/shine-border";
+
+// CSS entrance helper — fades + lifts in with a per-element delay (no JS lib).
+// Keyframe `enter-up` + reduced-motion handling live in globals.css.
+const enter = (delay = 0): React.CSSProperties => ({
+  animation: "enter-up 0.55s ease-out both",
+  animationDelay: delay ? `${delay}s` : undefined,
+});
 
 export function Hero({
   headline,
@@ -17,44 +23,27 @@ export function Hero({
   subheadline: string;
   cta: string;
 }) {
-  const reduce = useReducedMotion();
-
   return (
     <section className="relative overflow-hidden pt-32 pb-12 sm:pt-40">
       <HeroBackground />
       <Container className="relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl text-center"
-        >
+        <div className="mx-auto max-w-3xl text-center">
           <h1 className="font-display text-4xl font-semibold leading-[1.08] tracking-tight text-foreground drop-shadow-[0_0_32px_hsl(var(--glow)/0.16)] sm:text-6xl">
             {headline.split(" ").map((word, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 + i * 0.04 }}
-                className="inline-block"
-              >
+              <span key={i} className="inline-block" style={enter(0.1 + i * 0.04)}>
                 {word}&nbsp;
-              </motion.span>
+              </span>
             ))}
           </h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
+          <p
             className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground"
+            style={enter(0.5)}
           >
             {subheadline}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.5 }}
+          </p>
+          <div
             className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            style={enter(0.65)}
           >
             <ButtonLink href="/contact" size="lg" className="group">
               {cta}
@@ -63,13 +52,13 @@ export function Hero({
             <ButtonLink href="/services" size="lg" variant="outline">
               Explore solutions
             </ButtonLink>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Offensive-security engagement console — product preview.
             Parallax gives it subtle scroll-linked depth against the backdrop. */}
         <Parallax speed={36}>
-          <SolutionsPreview reduce={!!reduce} />
+          <SolutionsPreview />
         </Parallax>
       </Container>
     </section>
@@ -142,20 +131,19 @@ function FeedRow({ f }: { f: Finding }) {
 
 /**
  * Engagement feed: a slow auto-advancing ticker. Each row is a FIXED-HEIGHT slot
- * whose content crossfades to the next finding — because slots never change size
- * or count, rows can't overlap each other (the previous popLayout approach let
- * exiting items pile up at the top). Each crossfade is clipped to its own slot.
- * Motion is disabled under prefers-reduced-motion.
+ * whose content fades to the next finding. Keying the inner element by finding id
+ * remounts it on change, replaying the CSS `feed-in` entrance. Auto-advance is
+ * paused under prefers-reduced-motion.
  */
-function EngagementFeed({ reduce }: { reduce: boolean }) {
+function EngagementFeed() {
   const n = FINDINGS.length;
   const [start, setStart] = React.useState(0);
 
   React.useEffect(() => {
-    if (reduce) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => setStart((s) => (s + 1) % n), SCROLL_MS);
     return () => clearInterval(id);
-  }, [reduce, n]);
+  }, [n]);
 
   return (
     <ul className="space-y-2.5">
@@ -163,18 +151,12 @@ function EngagementFeed({ reduce }: { reduce: boolean }) {
         const f = FINDINGS[(start + slot) % n];
         return (
           <li key={slot} className="relative h-[56px] overflow-hidden rounded-lg">
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.div
-                key={f.id}
-                initial={reduce ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduce ? undefined : { opacity: 0, y: -18 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 flex items-center gap-3 rounded-lg bg-foreground/[0.03] px-3 transition-colors hover:bg-foreground/[0.06]"
-              >
-                <FeedRow f={f} />
-              </motion.div>
-            </AnimatePresence>
+            <div
+              key={f.id}
+              className="absolute inset-0 flex items-center gap-3 rounded-lg bg-foreground/[0.03] px-3 transition-colors hover:bg-foreground/[0.06] motion-safe:animate-[feed-in_0.45s_cubic-bezier(0.22,1,0.36,1)]"
+            >
+              <FeedRow f={f} />
+            </div>
           </li>
         );
       })}
@@ -182,7 +164,7 @@ function EngagementFeed({ reduce }: { reduce: boolean }) {
   );
 }
 
-function SolutionsPreview({ reduce }: { reduce: boolean }) {
+function SolutionsPreview() {
   const stats = [
     { icon: Bug, label: "Exploitable findings", value: "1,240+" },
     { icon: Swords, label: "Time to domain admin", value: "< 3h" },
@@ -190,11 +172,9 @@ function SolutionsPreview({ reduce }: { reduce: boolean }) {
   ];
 
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 32 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className="relative mx-auto mt-20 max-w-6xl"
+      style={{ animation: "enter-up 0.7s ease-out both", animationDelay: "0.5s" }}
     >
       {/* Soft ambient glow — static, no animation */}
       <div className="pointer-events-none absolute -inset-8 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_top,hsl(var(--glow)/0.16),transparent_60%)] blur-2xl" />
@@ -205,7 +185,7 @@ function SolutionsPreview({ reduce }: { reduce: boolean }) {
         borderWidth={2}
         duration={9}
         color="hsl(var(--shine))"
-        className="w-full min-w-0 bg-transparent p-[2px] dark:bg-transparent"
+        className="w-full min-w-0 bg-transparent p-[2px]"
       >
       <div className="relative w-full overflow-hidden rounded-2xl border border-border/60 bg-card/85 shadow-2xl shadow-black/40 backdrop-blur-xl">
         {/* window bar */}
@@ -215,7 +195,7 @@ function SolutionsPreview({ reduce }: { reduce: boolean }) {
           <span className="h-2.5 w-2.5 rounded-full bg-foreground/15" />
           <span className="ml-3 hidden text-xs text-muted-foreground sm:inline">Offensive Security Console</span>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.06] px-2.5 py-1 text-xs text-muted-foreground">
-            <span className={`h-1.5 w-1.5 rounded-full bg-foreground/80 ${reduce ? "" : "animate-pulse"}`} />
+            <span className="h-1.5 w-1.5 rounded-full bg-foreground/80 motion-safe:animate-pulse" />
             Engagement active
           </span>
         </div>
@@ -227,7 +207,7 @@ function SolutionsPreview({ reduce }: { reduce: boolean }) {
               <p className="text-sm font-semibold">Engagement feed</p>
               <Crosshair className="h-4 w-4 text-muted-foreground" />
             </div>
-            <EngagementFeed reduce={reduce} />
+            <EngagementFeed />
           </div>
 
           {/* outcome stats */}
@@ -261,6 +241,6 @@ function SolutionsPreview({ reduce }: { reduce: boolean }) {
         />
       </div>
       </ShineBorder>
-    </motion.div>
+    </div>
   );
 }

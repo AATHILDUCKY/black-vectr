@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Reveal } from "@/components/animation/reveal";
 import type { PortfolioItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -43,14 +43,7 @@ export function PortfolioGrid({
 
       <div className="grid gap-6 sm:grid-cols-2">
         {filtered.map((item, i) => (
-          <motion.div
-            key={item.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: (i % 4) * 0.05 }}
-          >
+          <Reveal key={item.id} delay={(i % 4) * 0.05}>
             <Link
               href={`/portfolio/${item.slug}`}
               className="card-elevated group block h-full overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
@@ -81,7 +74,7 @@ export function PortfolioGrid({
                 <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.summary}</p>
               </div>
             </Link>
-          </motion.div>
+          </Reveal>
         ))}
       </div>
     </div>
