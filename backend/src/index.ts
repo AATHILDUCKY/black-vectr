@@ -4,8 +4,13 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import path from "path";
 import { env } from "./lib/env";
+import { runMigrations, shouldAutoMigrate } from "./lib/migrate";
 import api from "./routes";
 import { errorHandler, notFound } from "./middleware/error";
+
+// Bring the database up to date with the schema before serving any requests,
+// so a deploy that adds a column can't 500 with Prisma P2022 errors.
+if (shouldAutoMigrate) runMigrations();
 
 const app = express();
 
