@@ -40,7 +40,7 @@ export default async function ServiceDetailPage({
   return (
     <>
       <Section className="pt-32 sm:pt-40">
-        <Container className="max-w-3xl">
+        <Container className="max-w-4xl">
           <Link
             href="/services"
             className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -51,10 +51,10 @@ export default async function ServiceDetailPage({
             <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-gradient text-background">
               <ServiceIcon name={service.icon} className="h-7 w-7" />
             </div>
-            <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl">
               {service.title}
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground">{service.shortDescription}</p>
+            <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{service.shortDescription}</p>
           </Reveal>
 
           <Reveal delay={0.1} className="mt-10 space-y-4 text-base leading-relaxed text-muted-foreground">

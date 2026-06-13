@@ -55,7 +55,7 @@ export default async function BlogPostPage({
   return (
     <Section className="pt-32 sm:pt-40">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Container className="max-w-2xl">
+      <Container className="max-w-4xl">
         <Link
           href="/blog"
           className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -68,24 +68,25 @@ export default async function BlogPostPage({
             <span className="text-sm text-muted-foreground">{formatDate(post.publishedAt)}</span>
           )}
         </div>
-        <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+        <h1 className="max-w-3xl font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
           {post.title}
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground">{post.excerpt}</p>
+        <p className="mt-4 max-w-3xl text-base text-muted-foreground sm:text-lg">{post.excerpt}</p>
 
         {post.coverImage && (
-          <div className="mt-8 overflow-hidden rounded-2xl">
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-muted/40">
             <OptimizedImage
               src={post.coverImage}
               alt={post.title}
-              className="w-full"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 768px"
+              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1400px) 92vw, 1100px"
               priority
             />
           </div>
         )}
 
-        <article className="prose-content mt-10 space-y-4 leading-relaxed text-foreground/90">
+        <article className="prose-content mt-10 max-w-3xl space-y-4 leading-relaxed text-foreground/90">
           <MarkdownContent>{post.body}</MarkdownContent>
         </article>
       </Container>

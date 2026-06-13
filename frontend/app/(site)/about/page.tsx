@@ -24,7 +24,7 @@ export default async function AboutPage() {
   return (
     <>
       <Section className="pt-32 sm:pt-40">
-        <Container className="max-w-3xl">
+        <Container className="max-w-4xl">
           <SectionHeading
             align="left"
             eyebrow="About us"

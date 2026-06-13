@@ -35,7 +35,7 @@ export default async function PortfolioDetailPage({
 
   return (
     <Section className="pt-32 sm:pt-40">
-      <Container className="max-w-3xl">
+      <Container className="max-w-4xl">
         <Link
           href="/portfolio"
           className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -46,14 +46,14 @@ export default async function PortfolioDetailPage({
           <span className="text-sm font-medium uppercase tracking-wider text-primary">
             {item.category}
           </span>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-2 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl">
             {item.title}
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">Client: {item.client}</p>
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="mt-8 flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl bg-accent-gradient">
+          <div className="relative mt-8 flex aspect-[16/9] items-center justify-center overflow-hidden rounded-2xl bg-accent-gradient">
             {item.images[0] ? (
               <OptimizedImage
                 src={item.images[0]}

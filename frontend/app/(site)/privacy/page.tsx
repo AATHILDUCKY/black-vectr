@@ -17,10 +17,10 @@ export default async function PrivacyPage() {
 
   return (
     <Section className="pt-32 sm:pt-40">
-      <Container className="max-w-2xl">
+      <Container className="max-w-4xl">
         <h1 className="font-display text-4xl font-semibold tracking-tight">Privacy Policy</h1>
         <p className="mt-2 text-sm text-muted-foreground">Last updated: {updated}</p>
-        <div className="prose-content mt-8 space-y-4 text-sm leading-relaxed text-muted-foreground">
+        <div className="prose-content mt-8 max-w-3xl space-y-4 text-sm leading-relaxed text-muted-foreground">
           <MarkdownContent>{body}</MarkdownContent>
         </div>
       </Container>
